@@ -28,3 +28,54 @@ globalThis.setCardType = setCardType
 const securityCode = document.querySelector('#security-code')//Selecionando o elemento
 const securityCodePattern = {mask: '0000'}//Criando a mascara
 const securityCodeMasked = IMask(securityCode, securityCodePattern)//Utilizando o Imask para validar o campo
+
+const expirationDate = document.querySelector('#expiration-date')
+const expirationDatePattern = {
+    mask: "MM{/}YY",
+    blocks: {        
+        MM: {
+            mask: IMask.MaskedRange, //Método dentro do Imask para aplicar um range à mascara
+            from: 1,
+            to: 12
+        },
+        YY: {
+            mask: IMask.MaskedRange,
+            from: String(new Date().getFullYear()).slice(2), //Aqui eu recupero o ano atual e corto os dois primeiro digitos do ano, assim tenho o 22 de 2022.
+            to: String(new Date().getFullYear() + 10).slice(2)
+        },
+    },
+ }
+const expirationDateMasked = IMask(expirationDate, expirationDatePattern)
+
+const cardNumber = document.querySelector('#card-number')
+const cardNumberPattern = {
+    mask: [
+        {
+            mask: '0000 0000 0000 0000',
+            regex: /^4\d{0,15}/, //expressão regular (Regex) para o cartão visa
+            flagCard: 'visa',
+        },
+        {
+            mask: '0000 0000 0000 0000',
+            regex: /(^5[1-5]\d{0.2}|^22[2-9]\d|^2[3-7]\d{0,2})\d{0,12}/, //expressão regular (Regex) para o cartão mastercard
+            flagCard: 'mastercard',
+        },
+        {
+            mask: '0000 0000 0000 0000',
+            flagCard: 'default',
+        },
+    ],
+
+    //função de varredura das mascaras
+    dispatch: function (appended, dynamicMasked) {
+        //percorrendo as mascaras enquanto o usuario digita e caso uma letra seja digita, a letra é trocada por vazio
+        const number = (dynamicMasked.value + appended).replace(/\D/g,'');
+        //Se o usuario digitou certo e o numero deu "match" com o mascara a constante foundMask retorna true.
+        const foundMask = dynamicMasked.compiledMasks.find(({regex}) => number.match(regex));
+
+        console.log(foundMask)
+        return foundMask
+    },
+}
+
+const cardNumberMasked = IMask(cardNumber, cardNumberPattern)

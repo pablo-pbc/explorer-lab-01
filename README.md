@@ -46,3 +46,7 @@ Esse projeto está sob a licença MIT.
 ---
 
 Feito com ♥ by Rocketseat :wave: [Participe da nossa comunidade!](https://discord.gg/rocketseat)
+
+---
+
+Explore Lab conteudo da aula: https://efficient-sloth-d85.notion.site/Explorer-Lab-3c5610edf42c4c09be70d9fc8837055e
