@@ -57,7 +57,7 @@ const cardNumberPattern = {
         },
         {
             mask: '0000 0000 0000 0000',
-            regex: /(^5[1-5]\d{0.2}|^22[2-9]\d|^2[3-7]\d{0,2})\d{0,12}/, //expressão regular (Regex) para o cartão mastercard
+            regex: /(^5[1-5]\d{0,2}|^22[2-9]\d|^2[3-7]\d{0,2})\d{0,12}/, //expressão regular (Regex) para o cartão mastercard
             flagCard: 'mastercard',
         },
         {
@@ -72,10 +72,63 @@ const cardNumberPattern = {
         const number = (dynamicMasked.value + appended).replace(/\D/g,'');
         //Se o usuario digitou certo e o numero deu "match" com o mascara a constante foundMask retorna true.
         const foundMask = dynamicMasked.compiledMasks.find(({regex}) => number.match(regex));
-
-        console.log(foundMask)
         return foundMask
     },
 }
-
 const cardNumberMasked = IMask(cardNumber, cardNumberPattern)
+
+//Selecionando o botão de add cartao e adicionando um evento de click à ele
+const addButton = document.querySelector('#add-card')
+addButton.addEventListener('click', () => {
+    alert('Cartão adicionado!')
+})
+
+//Retirando o comportamento default do formulario
+document.querySelector('form').addEventListener('submit', (event) => {
+    event.preventDefault()
+})
+
+//Colocando o valor do input 'NOME' digitado pelo usuario no cartão de crédito
+const cardHolder = document.querySelector('#card-holder')
+cardHolder.addEventListener('input', () => {
+    const ccHolder = document.querySelector('.cc-holder .value')
+
+    //Adionando ao ccHolder o txt digitado e condicionando um um IF ternario
+    /**
+     * if ternário:
+     * SE cardHolder.value.length === 0 -> ccHolder.innerText = FULANO DA SILVA
+     * SE NÃO ccHolder.innerText = cardHolder.value
+     */
+    ccHolder.innerText = cardHolder.value.length === 0 ? "FULANO DA SILVA" : cardHolder.value
+})
+
+//Colocando o valor do input 'CVC' digitado pelo usuario no cartão de crédito
+securityCodeMasked.on('accept', () => {
+    // const ccSecurity = document.querySelector('.cc-security .value')
+    // ccSecurity.innerText = securityCodeMasked.value.length === 0 ? '123' : securityCodeMasked.value
+    updateSecurityCode(securityCodeMasked.value);
+})
+
+function updateSecurityCode(code) {
+    const ccSecurity = document.querySelector('.cc-security .value')
+    ccSecurity.innerText = code.length === 0 ? '123' : code
+}
+
+//Colocando o valor do input 'CARD NUMBER' digitado pelo usuario no cartão de crédito e mudando a bandeira do cartão
+cardNumberMasked.on('accept', () => {
+    const ccCardNumber = document.querySelector('div.cc-info > .cc-number')
+    const cardType = cardNumberMasked.masked.currentMask.flagCard //recuperando o valor 'flagcard' do array mask utilizado no cardNumberMasked
+
+    setCardType(cardType) // chamando a função que atribui o degrade e a bandeira do cartão ao cartão de crédito
+    ccCardNumber.innerText = cardNumberMasked.value.length === 0 ? '1234 5678 9012 3456' : cardNumberMasked.value
+})
+
+//Colocando o valor do input 'VALIDADE' digitado pelo usuario no cartão de crédito e mudando a bandeira do cartão
+expirationDateMasked.on('accept', () => {
+    updateExpirationDate(expirationDateMasked.value)
+})
+
+function updateExpirationDate(date) {
+    const ccExpiration = document.querySelector('.cc-extra .value')
+    ccExpiration.innerText = date.length === 0 ? "02/32" : date
+}
